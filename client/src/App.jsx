@@ -1,73 +1,58 @@
-import React, { useState } from "react";
+const { useState } = React;
 
 function App() {
   const [weather, setWeather] = useState("");
   const [length, setLength] = useState("");
   const [suggestion, setSuggestion] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const getSnack = async (e) => {
+  function getSnack(weather, length) {
+    weather = weather?.toLowerCase();
+    length = length?.toLowerCase();
+
+    if (!weather || !length) return "Please select both weather and hike length.";
+    if (weather === "hot" && length === "long") return "Pack trail mix, jerky, and water-rich fruit like oranges.";
+    if (weather === "hot" && length === "short") return "Bring a granola bar and an electrolyte drink.";
+    if (weather === "cold" && length === "long") return "Peanut butter sandwiches, chocolate, and hot cocoa in a thermos.";
+    if (weather === "cold" && length === "short") return "Nuts, a small energy bar, and warm tea.";
+    if (weather === "rainy") return "Compact snacks like protein bars and dried fruit — avoid soggy items!";
+    return "Classic trail mix and plenty of water always work!";
+  }
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setSuggestion("");
-
-    try {
-      const response = await fetch(`http://localhost:4000/snack?weather=${weather}&length=${length}`);
-      const data = await response.json();
-      setSuggestion(data.suggestion);
-    } catch (error) {
-      setSuggestion("Error fetching snack suggestion.");
-    }
-    setLoading(false);
+    setSuggestion(getSnack(weather, length));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-green-50 font-sans">
-      <div className="bg-white p-6 rounded-2xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-green-800 text-center mb-4">🥾 Trail Snack Picker</h1>
-        <form onSubmit={getSnack} className="space-y-4">
-          <div>
-            <label className="block font-semibold mb-1">Weather</label>
-            <select
-              value={weather}
-              onChange={(e) => setWeather(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
-              <option value="">Select...</option>
-              <option value="hot">Hot</option>
-              <option value="cold">Cold</option>
-              <option value="rainy">Rainy</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-1">Hike Length</label>
-            <select
-              value={length}
-              onChange={(e) => setLength(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
-              <option value="">Select...</option>
-              <option value="short">Short</option>
-              <option value="long">Long</option>
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded w-full"
-          >
-            {loading ? "Finding..." : "Get Snack Suggestion"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center text-green-900 font-medium text-lg">
-          {suggestion && <p>{suggestion}</p>}
+    <div style={{ fontFamily: "sans-serif", padding: "2rem", maxWidth: "400px", margin: "auto", background: "#f0fff4", borderRadius: "10px" }}>
+      <h1 style={{ textAlign: "center", color: "#065f46" }}>🥾 Trail Snack Picker</h1>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1rem" }}>
+        <div>
+          <label>Weather:</label>
+          <select value={weather} onChange={e => setWeather(e.target.value)} style={{ width: "100%", padding: "0.5rem", marginTop: "0.25rem" }}>
+            <option value="">Select...</option>
+            <option value="hot">Hot</option>
+            <option value="cold">Cold</option>
+            <option value="rainy">Rainy</option>
+          </select>
         </div>
-      </div>
+        <div>
+          <label>Hike Length:</label>
+          <select value={length} onChange={e => setLength(e.target.value)} style={{ width: "100%", padding: "0.5rem", marginTop: "0.25rem" }}>
+            <option value="">Select...</option>
+            <option value="short">Short</option>
+            <option value="long">Long</option>
+          </select>
+        </div>
+        <button type="submit" style={{ background: "#047857", color: "white", padding: "0.5rem", borderRadius: "5px", border: "none" }}>
+          Get Snack Suggestion
+        </button>
+      </form>
+      {suggestion && <p style={{ marginTop: "1rem", textAlign: "center", color: "#065f46", fontWeight: "bold" }}>{suggestion}</p>}
     </div>
   );
 }
 
-export default App;
+// Render
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
